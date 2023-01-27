@@ -1,0 +1,13 @@
+{
+  "name": "counter-mcu-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Nelson <nelsonkenmochi@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.12.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Websockets Client</title>
+</head>
+
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th,
+    td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+</style>
+
+<body>
+    <h1>Websockets Client</h1>
+    </head>
+
+    <table id="websocket-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>QTY</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="websocket-table-body">
+            <!-- This will be populated with WebSocket data -->
+        </tbody>
+    </table>
+
+    <div id="websocket-response"></div>
+    <script>
+        // Connect to WebSocket server
+        const ws = new WebSocket('ws://<IP_HERE>:8001');
+        const cachedData = {};
+
+        // Handle WebSocket connection
+        ws.onopen = () => {
+            console.log('WebSocket connection established');
+        };
+
+        // Handle incoming messages
+        ws.onmessage = (event) => {
+            const response = document.getElementById('websocket-response');
+            response.innerHTML = event.data;
+        };
+
+        ws.onmessage = (event) => {
+            console.log(cachedData);
+
+            if (Object.keys(cachedData).length === 0) {
+                JSON.parse(event.data).map(hostInfo => {
+                    cachedData[hostInfo.id] = hostInfo;
+                })
+            }
+            else {
+                const newItem = JSON.parse(event.data)[0];
+                cachedData[newItem.id] = newItem;
+            }
+
+            const tableBody = document.getElementById('websocket-table-body');
+            tableBody.innerHTML = '';
+            Object.values(cachedData).map(hostInfo => {
+                const newRow = document.createElement('tr');
+                const idCell = document.createElement('td');
+                const qtyCell = document.createElement('td');
+                const timestampCell = document.createElement('td');
+                idCell.innerHTML = hostInfo.id;
+                qtyCell.innerHTML = hostInfo.qty;
+                timestampCell.innerHTML = new Date(hostInfo.lastPing);
+                newRow.appendChild(idCell);
+                newRow.appendChild(qtyCell);
+                newRow.appendChild(timestampCell);
+                tableBody.appendChild(newRow);
+            });
+        };
+
+        // Handle WebSocket closure
+        ws.onclose = () => {
+            const response = document.getElementById('websocket-response');
+            const message = 'WebSocket connection closed';
+            console.log(message);
+            response.innerHTML = message;
+        };
+    </script>
+</body>
+
+</html>
