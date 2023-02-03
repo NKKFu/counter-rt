@@ -11,12 +11,12 @@
 // Create a display object of type TM1637Display
 TM1637Display display = TM1637Display(CLK, DIO);
 
-const char* ssid = "LIVE TIM_B884_2G";
-const char* password = "mxu64cj6cf";
+const char* ssid = "ICBEU_CLIENT";
+const char* password = "";
 const int button = 4;  //D2(gpio4)
 
 //Your Domain name with URL path or IP address with path
-String serverName = "http://192.168.1.19:8000/ping";
+String serverName = "http://192.168.125.53:8000/ping";
 int people_counted = 0;
 
 void setup() {

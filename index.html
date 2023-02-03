@@ -2,41 +2,64 @@
 <html>
 
 <head>
-    <title>Websockets Client</title>
+    <title>Dashboard</title>
 </head>
 
 <style>
+    * {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
     table {
         border-collapse: collapse;
         width: 100%;
+        border-radius: 5px;
     }
 
     th,
     td {
-        border: 1px solid black;
-        padding: 8px;
+        padding: 15px 0;
         text-align: left;
     }
+
+    tr {
+        padding: 10px;
+        text-align: left;
+        border-bottom: #d9d9d9 1px solid;
+    }
+
+    tr:first-child {
+        border-bottom: #d9d9d9 2px solid;
+    }    
+
+    .container {
+        border-radius: 5px;
+        box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.1);
+    }
 </style>
+<!--  background: url('/static/background.png'); -->
+<body style="background: #F26423;">
+    <div style="display: flex;">
+        <img src="/static/header.png"
+        style="width: 500px; height: 200px; object-fit: cover; margin: 0 auto;"
+        alt="">
+    </div>
 
-<body>
-    <h1>Websockets Client</h1>
-    </head>
-
-    <table id="websocket-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>QTY</th>
-                <th>Timestamp</th>
-            </tr>
-        </thead>
-        <tbody id="websocket-table-body">
-            <!-- This will be populated with WebSocket data -->
-        </tbody>
-    </table>
-
-    <div id="websocket-response"></div>
+    <div class="container" style="max-width: 1000px; margin: 0 auto; margin-top: 100px; background-color: white;
+        padding: 30px; ">
+        <table id="websocket-table" style="border-radius: 5px;">
+            <thead>
+                <tr>
+                    <th>Identificador</th>
+                    <th>Contagem</th>
+                    <th>Última contagem</th>
+                </tr>
+            </thead>
+            <tbody id="websocket-table-body">
+                <!-- This will be populated with WebSocket data -->
+            </tbody>
+        </table>
+    </div>
     <script>
         // Connect to WebSocket server
         const ws = new WebSocket('ws://<IP_HERE>:8001');
@@ -86,9 +109,8 @@
         // Handle WebSocket closure
         ws.onclose = () => {
             const response = document.getElementById('websocket-response');
-            const message = 'WebSocket connection closed';
-            console.log(message);
-            response.innerHTML = message;
+            const message = 'Conexão com servidor perdido';
+            alert(message);
         };
     </script>
 </body>

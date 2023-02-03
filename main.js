@@ -2,6 +2,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const url = require('url');
 const fs = require('fs');
+const path = require('path');
 
 const allHosts = {};
 const httpServer = http.createServer((req, res) => {
@@ -34,15 +35,48 @@ const httpServer = http.createServer((req, res) => {
             });
             res.end();
         } else if (req.url === '/') {
-            fs.readFile('./index.html', (err, data) => {
+            fs.readFile('./index.html', 'utf8', (err, data) => {
                 if (err) {
                     res.writeHead(404, { 'Content-Type': 'text/html' });
                     return res.end("404 Not Found");
                 }
-                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
                 data = data.toString();
-                res.write(data.replace('<IP_HERE>', '192.168.1.19'));
+                res.write(data.replace('<IP_HERE>', '192.168.125.53'));
                 return res.end();
+            });
+        } else if (req.url.startsWith('/static/')) {
+            // Serve static file
+            const filePath = path.join(__dirname, req.url);
+            const fileExt = path.extname(filePath);
+            let contentType = 'text/html';
+
+            switch (fileExt) {
+                case '.js':
+                    contentType = 'text/javascript';
+                    break;
+                case '.css':
+                    contentType = 'text/css';
+                    break;
+                case '.json':
+                    contentType = 'application/json';
+                    break;
+                case '.png':
+                    contentType = 'image/png';
+                    break;      
+                case '.jpg':
+                case '.jpeg':
+                    contentType = 'image/jpg';
+                    break;
+            }
+            fs.readFile(filePath, (err, data) => {
+                if (err) {
+                  res.writeHead(404, {'Content-Type': 'text/html'});
+                  res.end("<h1>404 Not Found</h1>");
+                } else {
+                  res.writeHead(200, {'Content-Type': contentType });
+                  res.end(data);
+                }
             });
         }
     } else {
