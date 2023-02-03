@@ -11,12 +11,12 @@
 // Create a display object of type TM1637Display
 TM1637Display display = TM1637Display(CLK, DIO);
 
-const char* ssid = "ICBEU_CLIENT";
-const char* password = "";
-const int button = 4;  //D2(gpio4)
+const char *ssid = "ICBEU_CLIENT";
+const char *password = "";
+const int button = 4;  // D2(gpio4)
 
-//Your Domain name with URL path or IP address with path
-String serverName = "http://192.168.125.53:8000/ping";
+// Your Domain name with URL path or IP address with path
+String serverName = "http://192.168.124.187:8000/ping";
 int people_counted = 0;
 
 void setup() {
@@ -26,22 +26,17 @@ void setup() {
   pinMode(button, INPUT_PULLUP);
 
   people_counted = 0;
-
   WiFi.begin(ssid, password);
-  Serial.println("Connecting");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.print("Connected to WiFi network with IP Address: ");
-  Serial.println(WiFi.localIP());
   display.showNumberDec(people_counted);
 }
 
+bool cannot_connect = false;
 void send_http_signal() {
   WiFiClient client;
   HTTPClient http;
+
+  // HTTP Timeout
+  http.setTimeout(1000);
 
   String serverPath = serverName + "?id=" + WiFi.macAddress() + "&qty=" + people_counted;
 
@@ -57,6 +52,13 @@ void send_http_signal() {
     String payload = http.getString();
     Serial.println(payload);
   } else {
+    // If it was timeout
+    if (httpResponseCode == HTTPC_ERROR_CONNECTION_REFUSED) {
+      cannot_connect = true;
+    } else {
+      cannot_connect = false;
+    }
+
     Serial.print("Error code: ");
     Serial.println(httpResponseCode);
   }
@@ -65,8 +67,13 @@ void send_http_signal() {
   http.end();
 }
 
+bool dots = false;
 void loop() {
   if (WiFi.status() != WL_CONNECTED) {
+    display.showNumberDec(people_counted, 0b01000000);
+    delay(200);
+    display.showNumberDec(people_counted, 0);
+    delay(200);
     Serial.println("WiFi Disconnected");
     return;
   }
@@ -97,8 +104,14 @@ void loop() {
       delay(5);
     }
     people_counted += 1;
-    display.showNumberDec(people_counted);
+    display.showNumberDec(0, true);
     send_http_signal();
+    if (cannot_connect) {
+      display.showNumberDecEx(
+        people_counted, 0b01000000, false, 4, 0);
+    } else {
+      display.showNumberDec(people_counted);
+    }
   }
 
   delay(5);
