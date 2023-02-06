@@ -42,7 +42,7 @@ const httpServer = http.createServer((req, res) => {
                 }
                 res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
                 data = data.toString();
-                res.write(data.replace('<IP_HERE>', '192.168.125.53'));
+                res.write(data.replace('<IP_HERE>', '192.168.124.187'));
                 return res.end();
             });
         } else if (req.url.startsWith('/static/')) {

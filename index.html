@@ -30,19 +30,25 @@
 
     tr:first-child {
         border-bottom: #d9d9d9 2px solid;
-    }    
+    }
 
     .container {
         border-radius: 5px;
         box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.1);
     }
+
+    .id-input {
+        border: 1px solid rgb(228, 228, 228);
+        padding: 5px 5px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
 </style>
 <!--  background: url('/static/background.png'); -->
+
 <body style="background: #F26423;">
     <div style="display: flex;">
-        <img src="/static/header.png"
-        style="width: 500px; height: 200px; object-fit: cover; margin: 0 auto;"
-        alt="">
+        <img src="/static/header.png" style="width: 500px; height: 200px; object-fit: cover; margin: 0 auto;" alt="">
     </div>
 
     <div class="container" style="max-width: 1000px; margin: 0 auto; margin-top: 100px; background-color: white;
@@ -91,12 +97,35 @@
 
             const tableBody = document.getElementById('websocket-table-body');
             tableBody.innerHTML = '';
+
+            const translateHashTable = JSON.parse(localStorage.getItem("translate"));
+
             Object.values(cachedData).map(hostInfo => {
                 const newRow = document.createElement('tr');
                 const idCell = document.createElement('td');
                 const qtyCell = document.createElement('td');
                 const timestampCell = document.createElement('td');
-                idCell.innerHTML = hostInfo.id;
+
+                const idInput = document.createElement('input');
+
+                if (translateHashTable && translateHashTable[hostInfo.id]) {
+                    idInput.value = translateHashTable[hostInfo.id];
+                } else {
+                    idInput.value = hostInfo.id;
+                }
+
+                idInput.setAttribute('id', hostInfo.id);
+                idInput.classList = ["id-input"];
+                idInput.onchange = (e) => {
+                    const translate = {
+                        [idInput.getAttribute('id', hostInfo.id)]: e.target.value,
+                    };
+                    localStorage.setItem("translate",
+                        JSON.stringify({ ...(JSON.parse(localStorage.getItem("translate"))), ...translate })
+                    );
+                };
+                idCell.appendChild(idInput);
+
                 qtyCell.innerHTML = hostInfo.qty;
                 timestampCell.innerHTML = new Date(hostInfo.lastPing);
                 newRow.appendChild(idCell);

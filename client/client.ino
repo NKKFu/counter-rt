@@ -51,12 +51,12 @@ void send_http_signal() {
     Serial.println(httpResponseCode);
     String payload = http.getString();
     Serial.println(payload);
+
+    cannot_connect = false;
   } else {
     // If it was timeout
     if (httpResponseCode == HTTPC_ERROR_CONNECTION_REFUSED) {
       cannot_connect = true;
-    } else {
-      cannot_connect = false;
     }
 
     Serial.print("Error code: ");
@@ -110,7 +110,7 @@ void loop() {
       display.showNumberDecEx(
         people_counted, 0b01000000, false, 4, 0);
     } else {
-      display.showNumberDec(people_counted);
+      display.showNumberDecEx(people_counted, 0, false, 4, 0);
     }
   }
 
